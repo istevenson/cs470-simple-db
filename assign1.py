@@ -4,6 +4,7 @@
 
 import sqlite3
 
+## check if table exists, create new if not
 def create_table(dbname, tablename, statement):
     with sqlite3.connect(dbname) as db:
         cursor = db.cursor()
@@ -14,7 +15,7 @@ def create_table(dbname, tablename, statement):
             user_message = raw_input("The {0} table exists already, do you want to recreate it? (y/n): ".format(tablename))
             if user_message == "y":
                 recreate_table = True
-                print("Ok, recreating {} table...")
+                print("Ok, recreating {} table...").format(tablename))
                 cursor.execute("drop table if exists {0}".format(tablename))
                 db.commit()
             else:
@@ -26,6 +27,7 @@ def create_table(dbname, tablename, statement):
             db.commit()
 
 
+## create tables
 if __name__ == "__main__":
     dbname = "car_dealership.db"
     statement = """create table Car
@@ -50,6 +52,8 @@ if __name__ == "__main__":
                 primary key(CustomerID))"""
     create_table(dbname, "Customer", statement)
 
+
+## insert new items to tables
 def insert_item(tablename, values):
     with sqlite3.connect(dbname) as db:
         cursor = db.cursor()
@@ -78,4 +82,20 @@ if __name__ == "__main__":
                         "913-555-4321", "03-01-1972")]
     insert_item("Car", car_values)
     insert_item("Customer", customer_values)
-             
+
+## update items
+def update_item(tablename, values):
+    with sqlite3.connect(dbname) as db:
+        cursor = db.cursor()
+        if tablename == "Car":
+            statement = "update Car set Color=? where CarID=?"
+        else:
+            statement = "update Customer set FullName=? where CustomerID=?"
+        cursor.execute(statement, values)
+        db.commit()
+
+if __name__ == "__main__":
+    car_value = ("Silver", 1)
+    customer_value = ("Jayne Doe", 2)
+    update_item("Car", car_value)
+    update_item("Customer", customer_value)
