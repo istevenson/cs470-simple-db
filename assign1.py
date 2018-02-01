@@ -1,6 +1,5 @@
 ## Imon Stevenson
-## 14192284
-## Assignment #1 in Python
+## DB in Python
 ## February 3, 2018
 
 import sqlite3
@@ -22,7 +21,7 @@ def create_table(dbname, tablename, statement):
                 print("Ok, {0} table kept.")
         else:
             recreate_table = True
-        if not recreate_table:
+        if recreate_table:
             cursor.execute(statement)
             db.commit()
 
@@ -40,17 +39,43 @@ if __name__ == "__main__":
              primary key(CarID))"""
     create_table(dbname, "Car", statement)
 
-def insert_item(values):
+if __name__ == "__main__":
+    dbname = "car_dealership.db"
+    statement = """create table Customer
+                (CustomerID integer,
+                FullName text,
+                Email text,
+                Phone text,
+                DOB text,
+                primary key(CustomerID))"""
+    create_table(dbname, "Customer", statement)
+
+def insert_item(tablename, values):
     with sqlite3.connect(dbname) as db:
         cursor = db.cursor()
-        statement = """insert into Car (Make, Model, Color,
-                       Year, Price, Condition) values
-                       (?, ?, ?, ?, ?, ?)"""
-        cursor.execute(statement, values)
+        if tablename == "Car":
+            statement = """insert into Car (Make, Model, Color,
+                           Year, Price, Condition) values
+                           (?, ?, ?, ?, ?, ?)"""
+        else:
+            statement = """insert into Customer (FullName,
+                                 Email, Phone, DOB) values
+                                 (?, ?, ?, ?)"""
+        cursor.executemany(statement, values)
         db.commit()
 
 if __name__ == "__main__":
-    values = ("Ford", "Explorer", "White",
-             2012, 10000, "Used")
-    insert_item(values)
+    car_values = [("Ford", "Explorer", "White",
+                    2012, 10000, "Used"),
+                  ("Toyota", "Highlander", "Midnight Blue",
+                    2010, 12000, "Used"),
+                  ("Jeep", "Grand Cherokee", "Black",
+                   2006, 4999, "Used")]
+    
+    customer_values = [("John Smith", "jsmith@gmail.com",
+                        "816-555-1234", "08-19-1985"),
+                       ("Jane Doe", "jdoe@yahoo.com",
+                        "913-555-4321", "03-01-1972")]
+    insert_item("Car", car_values)
+    insert_item("Customer", customer_values)
              
