@@ -15,7 +15,7 @@ def create_table(dbname, tablename, statement):
             user_message = raw_input("The {0} table exists already, do you want to recreate it? (y/n): ".format(tablename))
             if user_message == "y":
                 recreate_table = True
-                print("Ok, recreating {} table...").format(tablename))
+                print("Ok, recreating {0} table...\n".format(tablename))
                 cursor.execute("drop table if exists {0}".format(tablename))
                 db.commit()
             else:
@@ -25,6 +25,18 @@ def create_table(dbname, tablename, statement):
         if recreate_table:
             cursor.execute(statement)
             db.commit()
+
+## select and print table
+def print_table(tablename):
+    with sqlite3.connect(dbname) as db:
+        cursor = db.cursor()
+        cursor.execute("select * from {0}".format(tablename))
+        rows = cursor.fetchall()
+        
+        print("********** {0} Table **********".format(tablename))
+        for row in rows:
+            print(row)
+        print("\n")
 
 
 ## create tables
@@ -67,6 +79,7 @@ def insert_item(tablename, values):
                                  (?, ?, ?, ?)"""
         cursor.executemany(statement, values)
         db.commit()
+        print("Inserting items...\n")
 
 if __name__ == "__main__":
     car_values = [("Ford", "Explorer", "White",
@@ -82,6 +95,9 @@ if __name__ == "__main__":
                         "913-555-4321", "03-01-1972")]
     insert_item("Car", car_values)
     insert_item("Customer", customer_values)
+    
+    print_table("Car")
+    print_table("Customer")
 
 ## update items
 def update_item(tablename, values):
@@ -93,9 +109,15 @@ def update_item(tablename, values):
             statement = "update Customer set FullName=? where CustomerID=?"
         cursor.execute(statement, values)
         db.commit()
+        print("Updating items...\n")
 
 if __name__ == "__main__":
     car_value = ("Silver", 1)
     customer_value = ("Jayne Doe", 2)
+    
     update_item("Car", car_value)
     update_item("Customer", customer_value)
+
+    print_table("Car")
+    print_table("Customer")
+    
